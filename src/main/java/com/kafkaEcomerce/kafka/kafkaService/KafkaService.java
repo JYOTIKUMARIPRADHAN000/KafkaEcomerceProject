@@ -10,10 +10,9 @@ public class KafkaService {
 	@Autowired
 	KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(String _topic, String _key, String _msg) {
-		System.out.println("the msg is" + _msg + "from the topic " + _topic);
-		// String key = "CUS001";
-		kafkaTemplate.send(_topic, _key, _msg);
+	public void sendMessage(String _topic, String _key, String _event) {
+		System.out.println("the event is" + _event + "from the topic " + _topic);
+		kafkaTemplate.send(_topic, _key, _event);
 	}
 
 }

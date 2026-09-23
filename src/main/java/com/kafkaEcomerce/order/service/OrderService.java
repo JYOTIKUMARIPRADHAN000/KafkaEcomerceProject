@@ -3,20 +3,23 @@ package com.kafkaEcomerce.order.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kafkaEcomerce.kafka.event.OrderCreatedEvent;
 import com.kafkaEcomerce.kafka.kafkaService.KafkaService;
 import com.kafkaEcomerce.order.entity.OrderEntity;
 import com.kafkaEcomerce.order.repository.OrderRepository;
 import com.kafkaEcomerce.order.request.OrderRequest;
 import com.kafkaEcomerce.order.response.OrderResponse;
 
+import tools.jackson.databind.ObjectMapper;
+
 @Service
 public class OrderService {
 
 	@Autowired
 	OrderRepository orderRepository;
-	
+
 	@Autowired
-	KafkaService  kafkaService;
+	KafkaService kafkaService;
 
 	public OrderResponse createOrder(OrderRequest orderRequest) {
 
@@ -39,19 +42,41 @@ public class OrderService {
 
 		OrderEntity orderResEntity = orderRepository.save(reqEntity);
 
+		OrderCreatedEvent event = new OrderCreatedEvent();
+
+		event.setEventId("EVT-" + orderResEntity.getOrderId());
+		event.setEventType("ORDER_CREATED");
+		event.setOrderId(orderResEntity.getOrderId());
+		event.setCustomerId(orderResEntity.getCustomerId());
+		event.setAmount(orderResEntity.getAmount());
+		event.setDeliveryAddress(orderResEntity.getDeliveryAddress());
+
+		String topic = "order-created";
+		// Convert Event Object → JSON
+		String eventJson = jsonToString(event);
+		kafkaService.sendMessage(topic, String.valueOf(orderResEntity.getOrderId()), eventJson);
+
 		OrderResponse response = new OrderResponse();
 
 		response.setOrderId(orderResEntity.getOrderId());
 		response.setStatus(orderResEntity.getStatus());
-		
-		String topic ="order-created";
-		kafkaService.sendMessage(topic, null, null);
-		
 
 		return response;
 
 	}
-	
-	
+
+	private String jsonToString(OrderCreatedEvent orderCreatedEvent) {
+
+		try {
+
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			return objectMapper.writeValueAsString(orderCreatedEvent);
+
+		} catch (Exception e) {
+
+			throw new RuntimeException("Failed to convert event to JSON", e);
+		}
+	}
 
 }
