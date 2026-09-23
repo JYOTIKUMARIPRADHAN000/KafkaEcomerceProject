@@ -3,6 +3,7 @@ package com.kafkaEcomerce.order.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kafkaEcomerce.kafka.kafkaService.KafkaService;
 import com.kafkaEcomerce.order.entity.OrderEntity;
 import com.kafkaEcomerce.order.repository.OrderRepository;
 import com.kafkaEcomerce.order.request.OrderRequest;
@@ -13,6 +14,9 @@ public class OrderService {
 
 	@Autowired
 	OrderRepository orderRepository;
+	
+	@Autowired
+	KafkaService  kafkaService;
 
 	public OrderResponse createOrder(OrderRequest orderRequest) {
 
@@ -39,9 +43,15 @@ public class OrderService {
 
 		response.setOrderId(orderResEntity.getOrderId());
 		response.setStatus(orderResEntity.getStatus());
+		
+		String topic ="order-created";
+		kafkaService.sendMessage(topic, null, null);
+		
 
 		return response;
 
 	}
+	
+	
 
 }
