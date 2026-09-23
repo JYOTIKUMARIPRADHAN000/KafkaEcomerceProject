@@ -1,11 +1,11 @@
-package com.kafkaEcomerce.kafka.payment.consumer;
+package com.kafkaEcomerce.kafka.consumer;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.kafkaEcomerce.kafka.event.PaymentEvent;
-import com.kafkaEcomerce.kafka.payment.result.PaymentResult;
+import com.kafkaEcomerce.kafka.eventResult.PaymentResult;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -41,6 +41,7 @@ public class PaymentConsumer {
 				result.setAmount(event.getAmount());
 				result.setPaymentId("TXN-" + event.getOrderId());
 				result.setPaymentStatus("SUCCESS");
+				result.setDeliveryAddress(event.getDeliveryAddress());
 
 				String json = objectMapper.writeValueAsString(result);
 
@@ -60,6 +61,7 @@ public class PaymentConsumer {
 				result.setPaymentId("TXN-" + event.getOrderId());
 				result.setPaymentStatus("FAILED");
 				result.setReason("INSUFFICIENT_FUNDS");
+				result.setDeliveryAddress(event.getDeliveryAddress());
 
 				String json = objectMapper.writeValueAsString(result);
 

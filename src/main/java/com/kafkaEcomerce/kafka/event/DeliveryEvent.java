@@ -1,12 +1,11 @@
 package com.kafkaEcomerce.kafka.event;
 
-public class PaymentEvent {
-	private String eventId;
-	private String eventType;
-	private Long orderId;
-	private Long customerId;
-	private long amount;
-	private String deliveryAddress;
+public class DeliveryEvent {
+	 private String eventId;
+	    private String eventType;
+	    private Long orderId;
+	    private Long customerId;
+	    private String deliveryAddress;
 
 	public String getEventId() {
 		return eventId;
@@ -40,13 +39,6 @@ public class PaymentEvent {
 		this.customerId = customerId;
 	}
 
-	public long getAmount() {
-		return amount;
-	}
-
-	public void setAmount(long amount) {
-		this.amount = amount;
-	}
 
 	public String getDeliveryAddress() {
 		return deliveryAddress;
@@ -55,4 +47,6 @@ public class PaymentEvent {
 	public void setDeliveryAddress(String deliveryAddress) {
 		this.deliveryAddress = deliveryAddress;
 	}
+
+
 }
